@@ -29,9 +29,8 @@ interface paystackResponse {
   };
 }
 
-let ticketAmountUSD = 100; //usd
-
 export const handleBuyingTicket = async (data: FormData) => {
+  let ticketAmountUSD = 100; //usd
   const paystack_secret = PAYSTACK_SECRET_KEY;
 
   const paystackUrl = "https://api.paystack.co/transaction/initialize";
@@ -86,11 +85,15 @@ export const handleBuyingTicket = async (data: FormData) => {
     metadata.custom_fields.push(data);
   }
 
+  console.log(ticketAmountUSD, "before");
+
   if (currency === "KES") {
     const rateInKes = await getUSDExchangeRate();
 
     ticketAmountUSD *= rateInKes;
   }
+
+  console.log(ticketAmountUSD);
 
   const postData = {
     email,
