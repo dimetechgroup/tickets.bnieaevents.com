@@ -73,6 +73,11 @@ const HeroPage = ({ rate }: { rate: number }) => {
       reset();
       router.push(res.authorization_url);
       setPageLoading(true);
+
+      setTimeout(() => {
+        setPageLoading(false);
+      }, 3000);
+
       setIsLoading(false);
     } else {
       setIsLoading(false);
@@ -270,7 +275,7 @@ const HeroPage = ({ rate }: { rate: number }) => {
             fontWeight="semibold"
             fontSize={{ base: "md", sm: "lg" }}
           >
-            <Text fontWeight={600}>Is Member</Text>{" "}
+            <Text fontWeight={600}>Are you a BNI Member?</Text>{" "}
             <Switch onChange={() => setIsMember(!isMember)} />
           </Flex>
           {isMember && (
@@ -321,7 +326,7 @@ const HeroPage = ({ rate }: { rate: number }) => {
           <Button
             type="submit"
             isLoading={isLoading}
-            isDisabled={isLoading || !isValid}
+            isDisabled={isLoading}
             bg="brand.main"
             color="brand.white"
             borderRadius="none"

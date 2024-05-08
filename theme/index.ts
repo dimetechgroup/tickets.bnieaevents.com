@@ -1,9 +1,7 @@
-import { Checkbox, extendTheme } from "@chakra-ui/react";
+import { extendTheme } from "@chakra-ui/react";
 
 const theme = extendTheme({
   colors: {
-    //overide checkbox colors
-
     brand: {
       white: "#FFFFFF",
       black: "#000000",
