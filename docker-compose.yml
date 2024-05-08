@@ -9,4 +9,4 @@ services:
       - PAYSTACK_SECRET_KEY: "sk_live_dd7944e52540d437538d1159a1315830a457a047"
       - OPENSTACK_API_KEY: "44816f8ba08949edbfebd42b170ae4ea"
     ports:
-      - "3031: 3000"
+      - "3031:3000"
