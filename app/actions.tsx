@@ -90,7 +90,9 @@ export const handleBuyingTicket = async (data: FormData) => {
   if (currency === "KES") {
     const rateInKes = await getUSDExchangeRate();
 
-    ticketAmountUSD *= rateInKes;
+    let newAmount = ticketAmountUSD * rateInKes;
+
+    ticketAmountUSD = Math.ceil(newAmount);
   }
 
   console.log(ticketAmountUSD);

@@ -96,9 +96,9 @@ const HeroPage = ({ rate }: { rate: number }) => {
     if (noOfTickets) {
       switch (selectedCurrency) {
         case "KES":
-          return `${noOfTickets} x ${rate * 100}= KSH ${(
+          return `${noOfTickets} x ${Math.ceil(rate) * 100}= KSH ${(
             noOfTickets *
-            rate *
+            Math.ceil(rate) *
             100
           ).toLocaleString()}`;
         default:
