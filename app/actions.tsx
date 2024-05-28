@@ -130,11 +130,10 @@ export const handleBuyingTicket = async (data: FormData) => {
   } catch (e) {
     if (axios.isAxiosError(e)) {
       console.log(e.response?.data);
-      let message = e.response?.data.message;
 
       return {
         status: false,
-        message,
+        message: "Payment failed Try again later!",
       };
     } else {
       return {
