@@ -30,7 +30,7 @@ interface paystackResponse {
 }
 
 export const handleBuyingTicket = async (data: FormData) => {
-  let ticketAmountUSD = 100; //usd
+  let ticketAmountUSD = 150; //usd
   const paystack_secret = PAYSTACK_SECRET_KEY;
 
   const paystackUrl = "https://api.paystack.co/transaction/initialize";
