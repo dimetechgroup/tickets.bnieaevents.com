@@ -1,7 +1,7 @@
 "use server";
 
 import { FormData } from "@/components/hero";
-import { BASE_URL, PAYSTACK_SECRET_KEY } from "@/config";
+import { BASE_URL, PAYSTACK_SECRET_KEY, TICKET_AMOUNT } from "@/config";
 import { FormSchema } from "@/schemas";
 import { getUSDExchangeRate } from "@/utils";
 import axios, { AxiosResponse } from "axios";
@@ -30,7 +30,7 @@ interface paystackResponse {
 }
 
 export const handleBuyingTicket = async (data: FormData) => {
-  let ticketAmountUSD = 100; //usd
+  let ticketAmountUSD = TICKET_AMOUNT; //usd
   const paystack_secret = PAYSTACK_SECRET_KEY;
 
   const paystackUrl = "https://api.paystack.co/transaction/initialize";

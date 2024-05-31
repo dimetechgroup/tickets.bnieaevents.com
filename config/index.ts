@@ -5,3 +5,5 @@ export const BASE_URL =
   process.env.BASE_URL || "https://tickets.bnieaevents.com";
 export const OPENSTACK_API_KEY =
   process.env.OPENSTACK_API_KEY || "44816f8ba08949edbfebd42b170ae4ea";
+
+export const TICKET_AMOUNT = 150;

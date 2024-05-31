@@ -15,7 +15,6 @@ import {
   Heading,
   Input,
   Select,
-  Spinner,
   Stack,
   StackDivider,
   Switch,
@@ -30,6 +29,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import Loading from "./loader";
+import { TICKET_AMOUNT } from "@/config";
 
 const currencyOptions = [
   {
@@ -96,20 +96,20 @@ const HeroPage = ({ rate }: { rate: number }) => {
     if (noOfTickets) {
       switch (selectedCurrency) {
         case "KES":
-          return `${noOfTickets} x ${rate}= KSH ${(
-            noOfTickets *
-            Math.ceil(rate) *
-            100
+          return `${noOfTickets} x ${TICKET_AMOUNT} x ${rate}= KSH ${Math.ceil(
+            noOfTickets * rate * TICKET_AMOUNT
           ).toLocaleString()}`;
         default:
-          return `${noOfTickets} x 100 = $ ${noOfTickets * 100}`;
+          return `${noOfTickets} x ${TICKET_AMOUNT} = $ ${
+            noOfTickets * TICKET_AMOUNT
+          }`;
       }
     } else {
       switch (selectedCurrency) {
         case "KES":
-          return `@ KSH ${rate * 100}`;
+          return `@ KSH ${rate * TICKET_AMOUNT}`;
         default:
-          return `$ 100`;
+          return `$ ${TICKET_AMOUNT}`;
       }
     }
   }
