@@ -229,7 +229,9 @@ const HeroPage = ({ rate }: { rate: number }) => {
                 {errors.numberOfTickets.message}
               </FormErrorMessage>
             ) : (
-              <FormHelperText>Each ticket costs $100</FormHelperText>
+              <FormHelperText>
+                Each ticket costs ${TICKET_AMOUNT}
+              </FormHelperText>
             )}
           </FormControl>
           <FormControl isRequired isInvalid={!!errors.currency}>
