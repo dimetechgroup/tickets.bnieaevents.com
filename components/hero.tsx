@@ -96,20 +96,20 @@ const HeroPage = ({ rate }: { rate: number }) => {
     if (noOfTickets) {
       switch (selectedCurrency) {
         case "KES":
-          return `${noOfTickets} x ${Math.ceil(rate) * 150}= KSH ${(
+          return `${noOfTickets} x ${Math.ceil(rate) * 100}= KSH ${(
             noOfTickets *
             Math.ceil(rate) *
-            150
+            100
           ).toLocaleString()}`;
         default:
-          return `${noOfTickets} x 150 = $ ${noOfTickets * 150}`;
+          return `${noOfTickets} x 100 = $ ${noOfTickets * 100}`;
       }
     } else {
       switch (selectedCurrency) {
         case "KES":
-          return `@ KSH ${rate * 150}`;
+          return `@ KSH ${rate * 100}`;
         default:
-          return `$ 150`;
+          return `$ 100`;
       }
     }
   }
@@ -229,7 +229,7 @@ const HeroPage = ({ rate }: { rate: number }) => {
                 {errors.numberOfTickets.message}
               </FormErrorMessage>
             ) : (
-              <FormHelperText>Each ticket costs $150</FormHelperText>
+              <FormHelperText>Each ticket costs $100</FormHelperText>
             )}
           </FormControl>
           <FormControl isRequired isInvalid={!!errors.currency}>
