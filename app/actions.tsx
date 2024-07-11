@@ -95,7 +95,7 @@ export const handleBuyingTicket = async (data: FormData) => {
     ticketAmountUSD = Math.ceil(newAmount);
   }
 
-  console.log(ticketAmountUSD);
+  // console.log(ticketAmountUSD);
 
   const postData = {
     email,
