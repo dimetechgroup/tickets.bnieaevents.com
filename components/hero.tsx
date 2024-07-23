@@ -96,20 +96,20 @@ const HeroPage = ({ rate }: { rate: number }) => {
     if (noOfTickets) {
       switch (selectedCurrency) {
         case "KES":
-          return `${noOfTickets} x ${Math.ceil(rate) * 100}= KSH ${(
+          return `${noOfTickets} x ${Math.ceil(rate) * 150}= KSH ${(
             noOfTickets *
             Math.ceil(rate) *
-            100
+            150
           ).toLocaleString()}`;
         default:
-          return `${noOfTickets} x 100 = $ ${noOfTickets * 100}`;
+          return `${noOfTickets} x 150 = $ ${noOfTickets * 150}`;
       }
     } else {
       switch (selectedCurrency) {
         case "KES":
-          return `@ KSH ${rate * 100}`;
+          return `@ KSH ${rate * 150}`;
         default:
-          return `$ 100`;
+          return `$ 150`;
       }
     }
   }
