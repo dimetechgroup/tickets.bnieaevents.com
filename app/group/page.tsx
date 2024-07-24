@@ -1,5 +1,6 @@
 "use client";
 import { handleBuyingTicket } from "@/app/actions";
+import Loading from "@/components/loader";
 import { CancelIcon } from "@/icons";
 import { FormSchema } from "@/schemas";
 import {
@@ -15,7 +16,6 @@ import {
   Heading,
   Input,
   Select,
-  Spinner,
   Stack,
   StackDivider,
   Switch,
@@ -29,7 +29,6 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import Loading from "./loader";
 
 const currencyOptions = [
   {
@@ -44,7 +43,7 @@ const currencyOptions = [
 
 export type FormData = z.infer<typeof FormSchema>;
 
-const HeroPage = ({ rate }: { rate: number }) => {
+const Group = ({ rate }: { rate: number }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isMember, setIsMember] = useState(false);
   const [pageLoading, setPageLoading] = useState(false);
@@ -63,7 +62,7 @@ const HeroPage = ({ rate }: { rate: number }) => {
     mode: "onChange",
   });
   const selectedCurrency = watch("currency");
-  const noOfTickets = watch("numberOfTickets");
+  const noOfTickets = 6;
 
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
@@ -96,20 +95,21 @@ const HeroPage = ({ rate }: { rate: number }) => {
     if (noOfTickets) {
       switch (selectedCurrency) {
         case "KES":
-          return `${noOfTickets} x ${Math.ceil(rate) * 150}= KSH ${(
+          return `6 x ${Math.ceil(rate) * 100}= KSH ${(
             noOfTickets *
             Math.ceil(rate) *
             150
           ).toLocaleString()}`;
         default:
-          return `${noOfTickets} x 150 = $ ${noOfTickets * 150}`;
+          //   return `${noOfTickets} x 100 = $ ${noOfTickets * 100}`;
+          return `$600`;
       }
     } else {
       switch (selectedCurrency) {
         case "KES":
-          return `@ KSH ${rate * 150}`;
+          return `@ KSH ${rate * 100}`;
         default:
-          return `$ 150`;
+          return `$ 100`;
       }
     }
   }
@@ -140,7 +140,7 @@ const HeroPage = ({ rate }: { rate: number }) => {
         >
           <Heading fontSize="xl" color="brand.main" fontStyle="italic">
             <Box as="span" color="brand.black">
-              Early Bird {"->"}
+              Group Ticket {"->"}
             </Box>{" "}
             {getHeading()}
           </Heading>
@@ -155,7 +155,7 @@ const HeroPage = ({ rate }: { rate: number }) => {
             <Input
               {...register("name")}
               type="text"
-              placeholder="Enter your Full Name"
+              placeholder="Ticket Buyer Name"
               size="lg"
               border="3px solid var(--chakra-colors-brand-black)"
               borderRadius="none"
@@ -204,15 +204,17 @@ const HeroPage = ({ rate }: { rate: number }) => {
               fontWeight="semibold"
               fontSize={{ base: "md", sm: "lg" }}
             >
-              Number of Tickets (Max 20)
+              Number of Tickets (5)
             </FormLabel>
 
             <Input
               {...register("numberOfTickets", {
-                value: 1,
+                value: 6,
                 valueAsNumber: true,
               })}
-              type="number"
+              type="hidden"
+              defaultValue={6}
+              readOnly
               placeholder="Enter number of tickets"
               border="3px solid var(--chakra-colors-brand-black)"
               borderRadius="none"
@@ -223,15 +225,137 @@ const HeroPage = ({ rate }: { rate: number }) => {
               }}
             />
 
+            {/* ticket holder no 1 */}
+
             {errors.numberOfTickets ? (
               <FormErrorMessage>
                 <FormErrorIcon />
                 {errors.numberOfTickets.message}
               </FormErrorMessage>
             ) : (
-              <FormHelperText>Each ticket costs $150</FormHelperText>
+              <FormHelperText>Group Ticket costs $600</FormHelperText>
             )}
           </FormControl>
+
+          <FormControl isRequired isInvalid={!!errors.name}>
+            <FormLabel
+              fontWeight="semibold"
+              fontSize={{ base: "md", sm: "lg" }}
+            >
+              Ticket Holder Names
+            </FormLabel>
+            <Input
+              {...register("name")}
+              type="text"
+              placeholder="First ticket holder name"
+              size="lg"
+              border="3px solid var(--chakra-colors-brand-black)"
+              borderRadius="none"
+              _active={{ border: "none" }}
+              _hover={{ border: "3px solid var(--chakra-colors-brand-yellow)" }}
+              _focus={{
+                border: "3px solid var(--chakra-colors-brand-yellow)",
+              }}
+            />
+            {errors.name && (
+              <FormErrorMessage>
+                <FormErrorIcon />
+                {errors.name.message}
+              </FormErrorMessage>
+            )}
+
+            {/* second ticket holder */}
+
+            <Input
+              {...register("name")}
+              type="text"
+              placeholder="Second ticket holder name"
+              size="lg"
+              border="3px solid var(--chakra-colors-brand-black)"
+              borderRadius="none"
+              _active={{ border: "none" }}
+              _hover={{ border: "3px solid var(--chakra-colors-brand-yellow)" }}
+              _focus={{
+                border: "3px solid var(--chakra-colors-brand-yellow)",
+              }}
+            />
+
+            {errors.name && (
+              <FormErrorMessage>
+                <FormErrorIcon />
+                {errors.name.message}
+              </FormErrorMessage>
+            )}
+
+            {/* third ticket holder */}
+
+            <Input
+              {...register("name")}
+              type="text"
+              placeholder="Third ticket holder name"
+              size="lg"
+              border="3px solid var(--chakra-colors-brand-black)"
+              borderRadius="none"
+              _active={{ border: "none" }}
+              _hover={{ border: "3px solid var(--chakra-colors-brand-yellow)" }}
+              _focus={{
+                border: "3px solid var(--chakra-colors-brand-yellow)",
+              }}
+            />
+
+            {errors.name && (
+              <FormErrorMessage>
+                <FormErrorIcon />
+                {errors.name.message}
+              </FormErrorMessage>
+            )}
+
+            {/* fourth ticket holder */}
+            <Input
+              {...register("name")}
+              type="text"
+              placeholder="Fourth ticket holder name"
+              size="lg"
+              border="3px solid var(--chakra-colors-brand-black)"
+              borderRadius="none"
+              _active={{ border: "none" }}
+              _hover={{ border: "3px solid var(--chakra-colors-brand-yellow)" }}
+              _focus={{
+                border: "3px solid var(--chakra-colors-brand-yellow)",
+              }}
+            />
+
+            {errors.name && (
+              <FormErrorMessage>
+                <FormErrorIcon />
+                {errors.name.message}
+              </FormErrorMessage>
+            )}
+
+            {/* fifth ticket holder */}
+
+            <Input
+              {...register("name")}
+              type="text"
+              placeholder="Fifth ticket holder name"
+              size="lg"
+              border="3px solid var(--chakra-colors-brand-black)"
+              borderRadius="none"
+              _active={{ border: "none" }}
+              _hover={{ border: "3px solid var(--chakra-colors-brand-yellow)" }}
+              _focus={{
+                border: "3px solid var(--chakra-colors-brand-yellow)",
+              }}
+            />
+
+            {errors.name && (
+              <FormErrorMessage>
+                <FormErrorIcon />
+                {errors.name.message}
+              </FormErrorMessage>
+            )}
+          </FormControl>
+
           <FormControl isRequired isInvalid={!!errors.currency}>
             <FormLabel
               fontWeight="semibold"
@@ -359,4 +483,4 @@ const HeroPage = ({ rate }: { rate: number }) => {
   );
 };
 
-export default HeroPage;
+export default Group;
