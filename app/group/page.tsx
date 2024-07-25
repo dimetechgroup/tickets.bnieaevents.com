@@ -303,13 +303,6 @@ const Group = ({ rate }: { rate: number }) => {
               }}
             />
 
-            {errors.name && (
-              <FormErrorMessage>
-                <FormErrorIcon />
-                {errors.name.message}
-              </FormErrorMessage>
-            )}
-
             {/* fourth ticket holder */}
             <Input
               {...register("name")}
@@ -324,13 +317,6 @@ const Group = ({ rate }: { rate: number }) => {
                 border: "3px solid var(--chakra-colors-brand-yellow)",
               }}
             />
-
-            {errors.name && (
-              <FormErrorMessage>
-                <FormErrorIcon />
-                {errors.name.message}
-              </FormErrorMessage>
-            )}
 
             {/* fifth ticket holder */}
 
