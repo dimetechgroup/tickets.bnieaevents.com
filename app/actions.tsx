@@ -2,7 +2,7 @@
 
 import { FormData } from "@/components/hero";
 import { BASE_URL, PAYSTACK_SECRET_KEY } from "@/config";
-import { FormSchema } from "@/schemas";
+import { FormSchema, GroupSchema } from "@/schemas";
 import { getUSDExchangeRate } from "@/utils";
 import axios, { AxiosResponse } from "axios";
 import { TICKET_AMOUNT } from "@/config";
@@ -157,7 +157,7 @@ export const handleGroupTicket = async (data: FormData) => {
   const paystackUrl = "https://api.paystack.co/transaction/initialize";
 
   //use zod to validate the data
-  const validatedData = FormSchema.safeParse(data);
+  const validatedData = GroupSchema.safeParse(data);
 
   if (!validatedData.success) {
     return {
@@ -190,8 +190,6 @@ export const handleGroupTicket = async (data: FormData) => {
     custom_fields: {
       display_name: string;
       variable_name: string;
-      first_name?: string;
-      second_name?: string;
       value: string;
     }[];
   } = {

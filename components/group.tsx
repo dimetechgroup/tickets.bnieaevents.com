@@ -2,7 +2,7 @@
 import { handleGroupTicket } from "@/app/actions";
 import Loading from "@/components/loader";
 import { CancelIcon } from "@/icons";
-import { FormSchema } from "@/schemas";
+import { GroupSchema } from "@/schemas";
 import {
   Box,
   Button,
@@ -41,7 +41,7 @@ const currencyOptions = [
   },
 ];
 
-export type FormData = z.infer<typeof FormSchema>;
+export type FormData = z.infer<typeof GroupSchema>;
 
 const Group = ({ rate }: { rate: number }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -58,7 +58,7 @@ const Group = ({ rate }: { rate: number }) => {
     watch,
     formState: { errors, isValid },
   } = useForm<FormData>({
-    resolver: zodResolver(FormSchema),
+    resolver: zodResolver(GroupSchema),
     mode: "onChange",
   });
   const selectedCurrency = watch("currency");
