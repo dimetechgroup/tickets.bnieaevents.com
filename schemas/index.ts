@@ -5,6 +5,26 @@ export const FormSchema = z.object({
     message: "Name must be at least 3 characters long",
   }),
 
+  first_name: z.string().min(2, {
+    message: "Name must be at least 3 characters long",
+  }),
+
+  second_name: z.string().min(2, {
+    message: "Name must be at least 3 characters long",
+  }),
+
+  third_name: z.string().min(2, {
+    message: "Name must be at least 3 characters long",
+  }),
+
+  fourth_name: z.string().min(2, {
+    message: "Name must be at least 3 characters long",
+  }),
+
+  fifth_name: z.string().min(2, {
+    message: "Name must be at least 3 characters long",
+  }),
+
   email: z.string().email(),
   numberOfTickets: z
     .number({

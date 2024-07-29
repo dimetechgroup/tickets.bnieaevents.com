@@ -15,7 +15,6 @@ import {
   Heading,
   Input,
   Select,
-  Spinner,
   Stack,
   StackDivider,
   Switch,
@@ -30,6 +29,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import Loading from "./loader";
+import { TICKET_AMOUNT } from "@/config";
 
 const currencyOptions = [
   {
@@ -96,20 +96,20 @@ const HeroPage = ({ rate }: { rate: number }) => {
     if (noOfTickets) {
       switch (selectedCurrency) {
         case "KES":
-          return `${noOfTickets} x ${Math.ceil(rate) * 150}= KSH ${(
-            noOfTickets *
-            Math.ceil(rate) *
-            150
+          return `${noOfTickets} x ${TICKET_AMOUNT} x ${rate}= KSH ${Math.ceil(
+            noOfTickets * rate * TICKET_AMOUNT
           ).toLocaleString()}`;
         default:
-          return `${noOfTickets} x 150 = $ ${noOfTickets * 150}`;
+          return `${noOfTickets} x ${TICKET_AMOUNT} = $ ${
+            noOfTickets * TICKET_AMOUNT
+          }`;
       }
     } else {
       switch (selectedCurrency) {
         case "KES":
-          return `@ KSH ${rate * 150}`;
+          return `@ KSH ${rate * TICKET_AMOUNT}`;
         default:
-          return `$ 150`;
+          return `$ ${TICKET_AMOUNT}`;
       }
     }
   }
@@ -229,7 +229,9 @@ const HeroPage = ({ rate }: { rate: number }) => {
                 {errors.numberOfTickets.message}
               </FormErrorMessage>
             ) : (
-              <FormHelperText>Each ticket costs $150</FormHelperText>
+              <FormHelperText>
+                Each ticket costs ${TICKET_AMOUNT}
+              </FormHelperText>
             )}
           </FormControl>
           <FormControl isRequired isInvalid={!!errors.currency}>
