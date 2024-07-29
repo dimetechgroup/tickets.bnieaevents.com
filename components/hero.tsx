@@ -279,6 +279,17 @@ const HeroPage = ({ rate }: { rate: number }) => {
           >
             <Text fontWeight={600}>Are you a BNI Member?</Text>{" "}
             <Switch onChange={() => setIsMember(!isMember)} />
+            {/* link to /group */}
+            <Link href="/group">
+              <Text
+                color="brand.main"
+                fontWeight="semibold"
+                fontSize={{ base: "md", sm: "lg" }}
+                _hover={{ cursor: "pointer" }}
+              >
+                Group Ticket?
+              </Text>
+            </Link>
           </Flex>
           {isMember && (
             <AnimatePresence>
