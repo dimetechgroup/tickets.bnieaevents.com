@@ -6,4 +6,4 @@ export const BASE_URL =
 export const OPENSTACK_API_KEY =
   process.env.OPENSTACK_API_KEY || "44816f8ba08949edbfebd42b170ae4ea";
 
-export const TICKET_AMOUNT = 100;
+export const TICKET_AMOUNT = 150;
