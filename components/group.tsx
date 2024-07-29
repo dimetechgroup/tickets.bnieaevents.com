@@ -1,5 +1,5 @@
 "use client";
-import { handleBuyingTicket } from "@/app/actions";
+import { handleGroupTicket } from "@/app/actions";
 import Loading from "@/components/loader";
 import { CancelIcon } from "@/icons";
 import { FormSchema } from "@/schemas";
@@ -62,11 +62,11 @@ const Group = ({ rate }: { rate: number }) => {
     mode: "onChange",
   });
   const selectedCurrency = watch("currency");
-  const noOfTickets = 6;
+  const noOfTickets = 5;
 
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
-    const res = await handleBuyingTicket(data);
+    const res = await handleGroupTicket(data);
 
     if (res.status && res.authorization_url) {
       reset();
@@ -209,7 +209,7 @@ const Group = ({ rate }: { rate: number }) => {
 
             <Input
               {...register("numberOfTickets", {
-                value: 6,
+                value: 4,
                 valueAsNumber: true,
               })}
               type="hidden"
@@ -245,7 +245,7 @@ const Group = ({ rate }: { rate: number }) => {
               Ticket Holder Names
             </FormLabel>
             <Input
-              {...register("name")}
+              {...register("first_name")}
               type="text"
               placeholder="First ticket holder name"
               size="lg"
@@ -267,7 +267,7 @@ const Group = ({ rate }: { rate: number }) => {
             {/* second ticket holder */}
 
             <Input
-              {...register("name")}
+              {...register("second_name")}
               type="text"
               placeholder="Second ticket holder name"
               size="lg"
@@ -290,7 +290,7 @@ const Group = ({ rate }: { rate: number }) => {
             {/* third ticket holder */}
 
             <Input
-              {...register("name")}
+              {...register("third_name")}
               type="text"
               placeholder="Third ticket holder name"
               size="lg"
@@ -305,7 +305,7 @@ const Group = ({ rate }: { rate: number }) => {
 
             {/* fourth ticket holder */}
             <Input
-              {...register("name")}
+              {...register("fourth_name")}
               type="text"
               placeholder="Fourth ticket holder name"
               size="lg"
@@ -321,7 +321,7 @@ const Group = ({ rate }: { rate: number }) => {
             {/* fifth ticket holder */}
 
             <Input
-              {...register("name")}
+              {...register("fifth_name")}
               type="text"
               placeholder="Fifth ticket holder name"
               size="lg"
