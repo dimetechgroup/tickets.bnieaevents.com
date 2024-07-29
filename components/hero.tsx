@@ -279,12 +279,12 @@ const HeroPage = ({ rate }: { rate: number }) => {
           >
             <Text fontWeight={600}>Are you a BNI Member?</Text>{" "}
             <Switch onChange={() => setIsMember(!isMember)} />
-            {/* adding a link to /group  */}
+            {/* link to /group */}
             <Link href="/group">
               <Text
+                color="brand.main"
                 fontWeight="semibold"
                 fontSize={{ base: "md", sm: "lg" }}
-                color="brand.main"
                 _hover={{ cursor: "pointer" }}
               >
                 Group Ticket?
