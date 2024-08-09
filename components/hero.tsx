@@ -280,7 +280,7 @@ const HeroPage = ({ rate }: { rate: number }) => {
             <Text fontWeight={600}>Are you a BNI Member?</Text>{" "}
             <Switch onChange={() => setIsMember(!isMember)} />
             {/* link to /group */}
-            <Link href="/group">
+            {/* <Link href="/group">
               <Text
                 color="brand.main"
                 fontWeight="semibold"
@@ -289,7 +289,7 @@ const HeroPage = ({ rate }: { rate: number }) => {
               >
                 Group Ticket?
               </Text>
-            </Link>
+            </Link> */}
           </Flex>
           {isMember && (
             <AnimatePresence>
