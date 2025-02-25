@@ -1,302 +1,196 @@
 "use server";
 
-import { FormData } from "@/components/hero";
-import { BASE_URL, PAYSTACK_SECRET_KEY } from "@/config";
 import { FormSchema, GroupSchema } from "@/schemas";
+import { BASE_URL, PAYSTACK_SECRET_KEY } from "@/config";
 import { getUSDExchangeRate } from "@/utils";
-import axios, { AxiosResponse } from "axios";
-import { TICKET_AMOUNT } from "@/config";
+import axios from "axios";
+import {
+  ZodObject,
+  ZodString,
+  ZodEffects,
+  ZodNumber,
+  ZodOptional,
+  ZodEnum,
+  ZodTypeAny,
+} from "zod";
 
-interface paystackRequest {
-  email: string;
-  amount: string;
-  currency: string;
-  callback_url: string;
-  reference?: string;
-  metadata?: {
-    name: string;
-    email: string;
-    chapter?: string;
-  };
-}
+const PAYSTACK_URL = "https://api.paystack.co/transaction/initialize";
 
-interface paystackResponse {
-  status: boolean;
-  message: string;
-  data: {
-    authorization_url: string;
-    access_code: string;
-    reference: string;
-  };
-}
+const validateData = (
+  schema: ZodObject<
+    {
+      name: ZodString;
+      email: ZodString;
+      numberOfTickets: ZodEffects<ZodNumber, number, number>;
+      chapter: ZodOptional<ZodString>;
+      currency: ZodEffects<
+        ZodEnum<["KES", "USD"]>,
+        "KES" | "USD",
+        "KES" | "USD"
+      >;
+    },
+    "strip",
+    ZodTypeAny,
+    {
+      name: string;
+      email: string;
+      numberOfTickets: number;
+      currency: "KES" | "USD";
+      chapter?: string | undefined;
+    },
+    {
+      name: string;
+      email: string;
+      numberOfTickets: number;
+      currency: "KES" | "USD";
+      chapter?: string | undefined;
+    }
+  >,
+  data: any
+) => {
+  const result = schema.safeParse(data);
+  return result.success ? result.data : null;
+};
 
-export const handleBuyingTicket = async (data: FormData) => {
-  let ticketAmountUSD = TICKET_AMOUNT; //usd
-  const paystack_secret = PAYSTACK_SECRET_KEY;
-
-  const paystackUrl = "https://api.paystack.co/transaction/initialize";
-
-  //use zod to validate the data
-  const validatedData = FormSchema.safeParse(data);
-
-  if (!validatedData.success) {
-    return {
-      status: false,
-      message: "Invalid data Try again later!",
-    };
-  }
-
-  if (!paystack_secret) {
-    return {
-      status: false,
-      message: "Payment failed Try again later!",
-    };
-  }
-
-  const { name, numberOfTickets, chapter, email, currency } =
-    validatedData.data;
-
-  const metadata: {
-    custom_fields: {
-      display_name: string;
-      variable_name: string;
-      first_name?: string;
-      second_name?: string;
-      value: string;
-    }[];
-  } = {
+const buildMetadata = (
+  baseFields: { key: string; value: any }[],
+  extraFields: { key: string; value: any }[] = []
+) => {
+  return {
     custom_fields: [
-      {
-        display_name: "Name",
-        variable_name: "name",
-        value: name,
-      },
-      {
-        display_name: "Email",
-        variable_name: "email",
-        value: email,
-      },
+      ...baseFields,
+      ...extraFields.map(({ key, value }) => ({
+        display_name: key.replace("_", " "),
+        variable_name: key,
+        value,
+      })),
     ],
   };
+};
 
-  if (chapter) {
-    const data = {
-      display_name: "BNI Chapter",
-      variable_name: "chapter",
-      value: chapter,
-    };
-    metadata.custom_fields.push(data);
-  }
-
-  console.log(ticketAmountUSD, "before");
-
+const convertCurrency = async (amount: number, currency: string) => {
   if (currency === "KES") {
-    const rateInKes = await getUSDExchangeRate();
-
-    let newAmount = ticketAmountUSD * rateInKes;
-
-    ticketAmountUSD = Math.ceil(newAmount);
+    const rate = await getUSDExchangeRate();
+    return Math.ceil(amount * rate);
   }
+  return amount;
+};
 
-  // console.log(ticketAmountUSD);
+const processPayment = async (
+  email: any,
+  amount: string | number,
+  currency: any,
+  metadata: { custom_fields: any[] }
+) => {
+  if (!PAYSTACK_SECRET_KEY) {
+    return { status: false, message: "Payment failed. Try again later!" };
+  }
 
   const postData = {
     email,
-    amount: numberOfTickets * ticketAmountUSD + "00",
-    callback_url: BASE_URL + "/success",
-    currency: currency,
+    amount: amount + "00", // Convert to smallest currency unit
+    callback_url: `${BASE_URL}/success`,
+    currency,
     metadata,
   };
 
   try {
-    const response = await axios.post<
-      paystackRequest,
-      AxiosResponse<paystackResponse>
-    >(paystackUrl, postData, {
+    const response = await axios.post(PAYSTACK_URL, postData, {
       headers: {
-        Authorization: `Bearer ${paystack_secret}`,
+        Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
         "Content-Type": "application/json",
       },
     });
 
-    const {
-      status,
-      message,
-      data: { authorization_url },
-    } = response.data;
-
     return {
-      status,
-      message,
-      authorization_url,
+      status: response.data.status,
+      message: response.data.message,
+      authorization_url: response.data.data.authorization_url,
     };
   } catch (e) {
-    if (axios.isAxiosError(e)) {
-      console.log(e.response?.data);
-      let message = e.response?.data.message;
-
-      return {
-        status: false,
-        message,
-      };
-    } else {
-      return {
-        status: false,
-        message: "Payment failed Try again later!",
-      };
-    }
+    return {
+      status: false,
+      message: axios.isAxiosError(e)
+        ? e.response?.data.message
+        : "Payment failed. Try again later!",
+    };
   }
 };
 
-//group ticket purchase
+export const handleBuyingTicket = async (data: { ticketAmount: any }) => {
+  const validatedData = validateData(FormSchema, data);
+  if (!validatedData)
+    return { status: false, message: "Invalid data. Try again later!" };
 
-export const handleGroupTicket = async (data: FormData) => {
-  let ticketAmountUSD = TICKET_AMOUNT; //usd
-  const paystack_secret = PAYSTACK_SECRET_KEY;
+  let ticketAmountUSD = await convertCurrency(
+    data.ticketAmount || 0,
+    validatedData.currency
+  );
 
-  const paystackUrl = "https://api.paystack.co/transaction/initialize";
-
-  //use zod to validate the data
-  const validatedData = GroupSchema.safeParse(data);
-
-  if (!validatedData.success) {
-    return {
-      status: false,
-      message: "Invalid data Try again later!",
-    };
-  }
-
-  if (!paystack_secret) {
-    return {
-      status: false,
-      message: "Payment failed Try again later!",
-    };
-  }
-
-  const {
-    name,
-    numberOfTickets,
-    first_name,
-    second_name,
-    third_name,
-    fourth_name,
-    fifth_name,
-    chapter,
-    email,
-    currency,
-  } = validatedData.data;
-
-  const metadata: {
-    custom_fields: {
-      display_name: string;
-      variable_name: string;
-      value: string;
-    }[];
-  } = {
-    custom_fields: [
-      {
-        display_name: "Name",
-        variable_name: "name",
-        value: name,
-      },
-      {
-        display_name: "Email",
-        variable_name: "email",
-        value: email,
-      },
-      {
-        display_name: "First Name",
-        variable_name: "first_name",
-        value: first_name,
-      },
-      {
-        display_name: "Second Name",
-        variable_name: "second_name",
-        value: second_name,
-      },
-      {
-        display_name: "Third Name",
-        variable_name: "third_name",
-        value: third_name,
-      },
-      {
-        display_name: "Fourth Name",
-        variable_name: "fourth_name",
-        value: fourth_name,
-      },
-      {
-        display_name: "Fifth Name",
-        variable_name: "fifth_name",
-        value: fifth_name,
-      },
+  const metadata = buildMetadata(
+    [
+      { key: "name", value: validatedData.name },
+      { key: "email", value: validatedData.email },
     ],
-  };
+    validatedData.chapter
+      ? [{ key: "chapter", value: validatedData.chapter }]
+      : []
+  );
 
-  if (chapter) {
-    const data = {
-      display_name: "BNI Chapter",
-      variable_name: "chapter",
-      value: chapter,
-    };
-    metadata.custom_fields.push(data);
+  return processPayment(
+    validatedData.email,
+    validatedData.numberOfTickets * ticketAmountUSD,
+    validatedData.currency,
+    metadata
+  );
+};
+
+export const handleGroupTicket = async (data: {
+  name: string;
+  email: string;
+  numberOfTickets: number;
+  currency: "KES" | "USD";
+  first_name: string;
+  second_name: string;
+  third_name: string;
+  fourth_name: string;
+  fifth_name: string;
+  chapter?: string | undefined;
+  ticketAmount: number;
+}) => {
+  const validatedData = validateData(GroupSchema, data);
+  if (!validatedData)
+    return { status: false, message: "Invalid data. Try again later!" };
+
+  let ticketAmountUSD = await convertCurrency(
+    data.ticketAmount || 0,
+    validatedData.currency
+  );
+
+  const baseFields = [
+    { key: "name", value: validatedData.name },
+    { key: "email", value: validatedData.email },
+  ];
+  const extraFields = [
+    "first_name",
+    "second_name",
+    "third_name",
+    "fourth_name",
+    "fifth_name",
+  ]
+    .map((key) => ({ key, value: (validatedData as any)[key] }))
+    .filter(({ value }) => value);
+
+  if (validatedData.chapter) {
+    extraFields.push({ key: "chapter", value: validatedData.chapter });
   }
 
-  console.log(ticketAmountUSD, "before");
+  const metadata = buildMetadata(baseFields, extraFields);
 
-  if (currency === "KES") {
-    const rateInKes = await getUSDExchangeRate();
-
-    let newAmount = ticketAmountUSD * rateInKes;
-
-    ticketAmountUSD = Math.ceil(newAmount);
-  }
-
-  // console.log(ticketAmountUSD);
-
-  const postData = {
-    email,
-    amount: numberOfTickets * ticketAmountUSD + "00",
-    callback_url: BASE_URL + "/success",
-    currency: currency,
-    metadata,
-  };
-
-  try {
-    const response = await axios.post<
-      paystackRequest,
-      AxiosResponse<paystackResponse>
-    >(paystackUrl, postData, {
-      headers: {
-        Authorization: `Bearer ${paystack_secret}`,
-        "Content-Type": "application/json",
-      },
-    });
-
-    const {
-      status,
-      message,
-      data: { authorization_url },
-    } = response.data;
-
-    return {
-      status,
-      message,
-      authorization_url,
-    };
-  } catch (e) {
-    if (axios.isAxiosError(e)) {
-      console.log(e.response?.data);
-      let message = e.response?.data.message;
-
-      return {
-        status: false,
-        message,
-      };
-    } else {
-      return {
-        status: false,
-        message: "Payment failed Try again later!",
-      };
-    }
-  }
+  return processPayment(
+    validatedData.email,
+    validatedData.numberOfTickets * ticketAmountUSD,
+    validatedData.currency,
+    metadata
+  );
 };
