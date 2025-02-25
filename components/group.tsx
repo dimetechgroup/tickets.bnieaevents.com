@@ -64,7 +64,7 @@ const Group = ({ rate }: { rate: number }) => {
   const selectedCurrency = watch("currency");
   const noOfTickets = 5;
 
-  const onSubmit = async (data: FormData) => {
+  const onSubmit = async (data: any) => {
     setIsLoading(true);
     const res = await handleGroupTicket(data);
 
