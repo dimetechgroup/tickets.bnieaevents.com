@@ -78,8 +78,12 @@ const HeroPage = ({ rate }: { rate: number }) => {
 
   const TICKET_AMOUNT = ticketprice();
 
-  const onSubmit = async (data: FormData) => {
+  const onSubmit = async (data: any) => {
+    alert("submitting");
     setIsLoading(true);
+    // add the ticket amount to the data
+    data.ticketAmount = TICKET_AMOUNT;
+
     const res = await handleBuyingTicket(data);
 
     if (res.status && res.authorization_url) {
@@ -142,6 +146,7 @@ const HeroPage = ({ rate }: { rate: number }) => {
         <Stack
           my="2rem"
           as="form"
+          method="POST"
           w={{ base: "95%", sm: "md" }}
           borderRadius="md"
           bg="brand.white"

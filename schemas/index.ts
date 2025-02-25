@@ -5,6 +5,7 @@ export const FormSchema = z.object({
     message: "Name must be at least 3 characters long",
   }),
   email: z.string().email(),
+
   numberOfTickets: z
     .number({
       message: "Number of tickets required",
