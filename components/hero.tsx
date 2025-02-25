@@ -24,12 +24,11 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import Loading from "./loader";
-import { TICKET_AMOUNT } from "@/config";
 
 const currencyOptions = [
   {
@@ -64,6 +63,22 @@ const HeroPage = ({ rate }: { rate: number }) => {
   });
   const selectedCurrency = watch("currency");
   const noOfTickets = watch("numberOfTickets");
+
+  const searchParams = useSearchParams();
+
+  const price = searchParams.get("price");
+
+  const ticketprice = () => {
+    if (price === "JDUw") {
+      return 50;
+    } else {
+      return 120;
+    }
+  };
+
+  const TICKET_AMOUNT = ticketprice();
+
+  console.log(TICKET_AMOUNT);
 
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
@@ -140,7 +155,7 @@ const HeroPage = ({ rate }: { rate: number }) => {
         >
           <Heading fontSize="xl" color="brand.main" fontStyle="italic">
             <Box as="span" color="brand.black">
-              Early Bird {"->"}
+              Ticket Price {"->"}
             </Box>{" "}
             {getHeading()}
           </Heading>
