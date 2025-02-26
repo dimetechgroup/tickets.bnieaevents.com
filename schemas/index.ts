@@ -6,6 +6,8 @@ export const FormSchema = z.object({
   }),
   email: z.string().email(),
 
+  ticketoptions: z.string(),
+
   numberOfTickets: z
     .number({
       message: "Number of tickets required",
@@ -36,6 +38,8 @@ export const GroupSchema = z.object({
   name: z.string().min(2, {
     message: "Name must be at least 3 characters long",
   }),
+
+  ticketoptions: z.string(),
 
   first_name: z.string().min(2, {
     message: "Name must be at least 3 characters long",
