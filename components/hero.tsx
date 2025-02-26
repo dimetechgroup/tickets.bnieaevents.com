@@ -23,22 +23,26 @@ import {
 } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { set, z } from "zod";
 import Loading from "./loader";
 
 const currencyOptions = [
+  { label: "KES", value: "KES" },
+  { label: "USD", value: "USD" },
+];
+
+const TicketOptions = [
   {
-    label: "KES",
-    value: "KES",
+    id: 1,
+    label: "$50 23rd April (Only BNI Members)",
+    value: "50",
   },
-  {
-    label: "USD",
-    value: "USD",
-  },
+  { id: 2, label: "$50 24th April (Only BNI Members)", value: "50" },
+  { id: 3, label: "$50 25th April", value: "50" },
+  { id: 4, label: "$120 All Days", value: "120" },
 ];
 
 export type FormData = z.infer<typeof FormSchema>;
@@ -47,10 +51,12 @@ const HeroPage = ({ rate }: { rate: number }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isMember, setIsMember] = useState(false);
   const [pageLoading, setPageLoading] = useState(false);
+  const [ticketAmount, setTicketAmount] = useState<number>(0);
+  const [selectedTicketOption, setSelectedTicketOption] = useState<any>();
 
   const toast = useToast();
-
   const router = useRouter();
+
   const {
     register,
     handleSubmit,
@@ -61,28 +67,25 @@ const HeroPage = ({ rate }: { rate: number }) => {
     resolver: zodResolver(FormSchema),
     mode: "onChange",
   });
+
   const selectedCurrency = watch("currency");
-  const noOfTickets = watch("numberOfTickets");
+  const selectedTicket = watch("ticketoptions");
+  const noOfTickets = watch("numberOfTickets") || 1;
 
-  const searchParams = useSearchParams();
-
-  const price = searchParams.get("price");
-
-  const ticketprice = () => {
-    if (price === "JDUw") {
-      return 50;
-    } else {
-      return 120;
+  useEffect(() => {
+    if (selectedTicket) {
+      const ticket = TicketOptions.find((t) => t.id === Number(selectedTicket));
+      if (ticket) {
+        setTicketAmount(Number(ticket.value));
+        setSelectedTicketOption(ticket);
+      }
     }
-  };
-
-  const TICKET_AMOUNT = ticketprice();
+  }, [selectedTicket]);
 
   const onSubmit = async (data: any) => {
-    alert("submitting");
     setIsLoading(true);
-    // add the ticket amount to the data
-    data.ticketAmount = TICKET_AMOUNT;
+    data.ticketAmount = ticketAmount;
+    data.ticketoptions = selectedTicketOption?.label;
 
     const res = await handleBuyingTicket(data);
 
@@ -90,11 +93,7 @@ const HeroPage = ({ rate }: { rate: number }) => {
       reset();
       router.push(res.authorization_url);
       setPageLoading(true);
-
-      setTimeout(() => {
-        setPageLoading(false);
-      }, 3000);
-
+      setTimeout(() => setPageLoading(false), 3000);
       setIsLoading(false);
     } else {
       setIsLoading(false);
@@ -110,24 +109,18 @@ const HeroPage = ({ rate }: { rate: number }) => {
   };
 
   function getHeading() {
-    if (noOfTickets) {
-      switch (selectedCurrency) {
-        case "KES":
-          return `${noOfTickets} x ${TICKET_AMOUNT} x ${rate}= KSH ${Math.ceil(
-            noOfTickets * rate * TICKET_AMOUNT
-          ).toLocaleString()}`;
-        default:
-          return `${noOfTickets} x ${TICKET_AMOUNT} = $ ${
-            noOfTickets * TICKET_AMOUNT
-          }`;
-      }
+    if (!ticketAmount) return "Select a ticket";
+
+    if (selectedCurrency === "KES") {
+      return `${noOfTickets} x ${ticketAmount} x ${rate} = KSH ${(
+        noOfTickets *
+        rate *
+        ticketAmount
+      ).toLocaleString()}`;
     } else {
-      switch (selectedCurrency) {
-        case "KES":
-          return `@ KSH ${rate * TICKET_AMOUNT}`;
-        default:
-          return `$ ${TICKET_AMOUNT}`;
-      }
+      return `${noOfTickets} x ${ticketAmount} = $ ${
+        noOfTickets * ticketAmount
+      }`;
     }
   }
 
@@ -217,6 +210,38 @@ const HeroPage = ({ rate }: { rate: number }) => {
               </FormErrorMessage>
             )}
           </FormControl>
+          {/* Ticket Selection */}
+          <FormControl isRequired isInvalid={!!errors.ticketoptions}>
+            <FormLabel
+              fontWeight="semibold"
+              fontSize={{ base: "md", sm: "lg" }}
+            >
+              Select ticket
+            </FormLabel>
+            <Select
+              placeholder="Select"
+              size="lg"
+              focusBorderColor="brand.yellow"
+              border="3px solid var(--chakra-colors-brand-black)"
+              _hover={{ border: "3px solid var(--chakra-colors-brand-yellow)" }}
+              borderRadius="none"
+              {...register("ticketoptions")}
+            >
+              {TicketOptions.map((option) => (
+                <option key={option.value} value={option.id}>
+                  {option.label}
+                </option>
+              ))}
+            </Select>
+            {errors.ticketoptions && (
+              <FormErrorMessage>
+                <FormErrorIcon />
+                {errors.ticketoptions.message}
+              </FormErrorMessage>
+            )}
+          </FormControl>
+
+          {/* Number of Tickets */}
           <FormControl isRequired isInvalid={!!errors.numberOfTickets}>
             <FormLabel
               fontWeight="semibold"
@@ -224,34 +249,29 @@ const HeroPage = ({ rate }: { rate: number }) => {
             >
               Number of Tickets (Max 20)
             </FormLabel>
-
             <Input
               {...register("numberOfTickets", {
                 value: 1,
                 valueAsNumber: true,
               })}
               type="number"
-              placeholder="Enter number of tickets"
+              min={1}
+              max={20}
               border="3px solid var(--chakra-colors-brand-black)"
               borderRadius="none"
-              _active={{ border: "none" }}
               _hover={{ border: "3px solid var(--chakra-colors-brand-yellow)" }}
-              _focus={{
-                border: "3px solid var(--chakra-colors-brand-yellow)",
-              }}
             />
-
             {errors.numberOfTickets ? (
               <FormErrorMessage>
                 <FormErrorIcon />
                 {errors.numberOfTickets.message}
               </FormErrorMessage>
             ) : (
-              <FormHelperText>
-                Each ticket costs ${TICKET_AMOUNT}
-              </FormHelperText>
+              <FormHelperText>Each ticket costs ${ticketAmount}</FormHelperText>
             )}
           </FormControl>
+
+          {/* Currency Selection */}
           <FormControl isRequired isInvalid={!!errors.currency}>
             <FormLabel
               fontWeight="semibold"
@@ -264,22 +284,15 @@ const HeroPage = ({ rate }: { rate: number }) => {
               size="lg"
               focusBorderColor="brand.yellow"
               border="3px solid var(--chakra-colors-brand-black)"
-              _active={{ border: "none" }}
               _hover={{ border: "3px solid var(--chakra-colors-brand-yellow)" }}
               borderRadius="none"
-              fontWeight={600}
-              defaultValue="USD"
               {...register("currency")}
+              defaultValue={"USD"}
             >
               {currencyOptions.map((option) => (
-                <Box
-                  as="option"
-                  fontWeight={600}
-                  key={option.value}
-                  value={option.value}
-                >
+                <option key={option.value} value={option.value}>
                   {option.label}
-                </Box>
+                </option>
               ))}
             </Select>
             {errors.currency && (
@@ -354,6 +367,7 @@ const HeroPage = ({ rate }: { rate: number }) => {
             </AnimatePresence>
           )}
 
+          {/* Submit Button */}
           <Button
             type="submit"
             isLoading={isLoading}
@@ -361,29 +375,10 @@ const HeroPage = ({ rate }: { rate: number }) => {
             bg="brand.main"
             color="brand.white"
             borderRadius="none"
-            transition="all 0.3s ease-in-out"
-            border="3px solid"
-            borderColor="transparent"
-            py="1.3rem"
-            _hover={{
-              bg: "brand.black",
-            }}
+            _hover={{ bg: "brand.black" }}
           >
             GET TICKET
           </Button>
-          <Link href="https://bnieaevents.com">
-            <Stack
-              pos="absolute"
-              borderRadius="full"
-              bg="rgba(207, 32, 48,0.2)"
-              top={1}
-              right={3}
-              p=".1rem"
-              _hover={{ cursor: "pointer" }}
-            >
-              <CancelIcon boxSize={7} color="brand.main" />
-            </Stack>{" "}
-          </Link>
         </Stack>
       )}
     </Grid>

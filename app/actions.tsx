@@ -23,6 +23,7 @@ const validateData = (
       email: ZodString;
       numberOfTickets: ZodEffects<ZodNumber, number, number>;
       chapter: ZodOptional<ZodString>;
+      ticketoptions: ZodString;
       currency: ZodEffects<
         ZodEnum<["KES", "USD"]>,
         "KES" | "USD",
@@ -37,6 +38,7 @@ const validateData = (
       numberOfTickets: number;
       currency: "KES" | "USD";
       chapter?: string | undefined;
+      ticketoptions: string;
     },
     {
       name: string;
@@ -44,6 +46,7 @@ const validateData = (
       numberOfTickets: number;
       currency: "KES" | "USD";
       chapter?: string | undefined;
+      ticketoptions: string;
     }
   >,
   data: any
@@ -131,10 +134,13 @@ export const handleBuyingTicket = async (data: { ticketAmount: any }) => {
     [
       { key: "name", value: validatedData.name },
       { key: "email", value: validatedData.email },
+      { key: "ticketoptions", value: validatedData.ticketoptions },
+      { key: "numberOfTickets", value: validatedData.numberOfTickets },
     ],
-    validatedData.chapter
-      ? [{ key: "chapter", value: validatedData.chapter }]
-      : []
+    [
+      { key: "chapter", value: validatedData.chapter },
+      { key: "Ticket Options", value: validatedData.ticketoptions },
+    ]
   );
 
   return processPayment(
