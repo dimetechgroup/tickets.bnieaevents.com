@@ -28,6 +28,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { set, z } from "zod";
 import Loading from "./loader";
+import Link from "next/link";
 
 const currencyOptions = [
   { label: "KES", value: "KES" },
@@ -379,6 +380,19 @@ const HeroPage = ({ rate }: { rate: number }) => {
           >
             GET TICKET
           </Button>
+          <Link href="https://bnieaevents.com">
+            <Stack
+              pos="absolute"
+              borderRadius="full"
+              bg="rgba(207, 32, 48,0.2)"
+              top={1}
+              right={3}
+              p=".1rem"
+              _hover={{ cursor: "pointer" }}
+            >
+              <CancelIcon boxSize={7} color="brand.main" />
+            </Stack>{" "}
+          </Link>
         </Stack>
       )}
     </Grid>
